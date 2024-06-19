@@ -1,0 +1,18 @@
+- name: Study two name
+  id_lims: SQSCP
+  id_study_lims: 2
+  id_study_tmp: 1
+- name: Study three name
+  id_lims: SQSCP
+  id_study_lims: 3
+  id_study_tmp: 2
+- name: Study four name
+  id_lims: SQSCP
+  id_study_lims: 4
+  id_study_tmp: 3
+- name: Study five name
+  id_lims: SQSCP
+  id_study_lims: 5
+  id_study_tmp: 4
+
+
