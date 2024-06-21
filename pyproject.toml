@@ -6,15 +6,20 @@ authors = ["Marina Gourtovaia <mg8@sanger.ac.uk>"]
 license = "GPL-3.0-or-later"
 readme = "README.md"
 
+[tool.poetry.scripts]
+qc_state_notification = "npg_notify.porch_wrapper.qc_state:run" 
+
 [tool.poetry.dependencies]
 python = "^3.11"
-SQLAlchemy = { version = "^2.0.1", extras = ["pymysql"] }
+SQLAlchemy = { version="^2.0.1", extras=["pymysql"] }
 SQLAlchemy-Utils = "^0.41.2"
-cryptography = { version = "^41.0.3" }
+cryptography = { version="^41.0.3" }
+npg_porch_cli = { git="https://github.com/wtsi-npg/npg_porch_cli.git", branch="devel" }
 
 [tool.poetry.dev-dependencies]
 pytest = "^8.2.2"
-PyYAML = "^6.0.0" 
+PyYAML = "^6.0.0"
+requests-mock = "^1.12.1"
 ruff = "^0.4.9"
 
 [tool.ruff]
