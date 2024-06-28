@@ -1,14 +1,14 @@
-import pytest
 import os
 
+import pytest
+from npg_notify.db.mlwh import Base
 from npg_notify.db.utils import (
+    batch_load_from_yaml,
     create_schema,
     get_connection,
-    batch_load_from_yaml,
 )
-from npg_notify.db.mlwh import Base
 
-TEST_CONFIG_FILE= "qc_state_app_config.ini"
+TEST_CONFIG_FILE = "qc_state_app_config.ini"
 test_config = os.path.join(os.path.dirname(__file__), "data", TEST_CONFIG_FILE)
 
 
