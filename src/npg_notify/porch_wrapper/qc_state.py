@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import time
+from pathlib import PurePath
 from urllib.parse import urljoin
 
 from npg_notify.config import get_config_data
@@ -49,6 +50,11 @@ def run():
     ssl_cert_file = _get_ssl_cert_file_path(conf_file_path=conf_file_path)
     if ssl_cert_file:
         os.environ["SSL_CERT_FILE"] = ssl_cert_file
+        # For a custom CA SSL certificate, the directory  assigned to the
+        # REQUESTS_CA_BUNDLE env. variable should have been 'treated' with the
+        # c_rehash tool, which is supplied with the Python interpreter, see
+        # https://requests.readthedocs.io/en/latest/user/advanced/#ssl-cert-verification
+        os.environ["REQUESTS_CA_BUNDLE"] = str(PurePath(ssl_cert_file).parent)
 
     action = args.action
     if action == "register":
