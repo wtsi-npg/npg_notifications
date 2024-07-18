@@ -1,12 +1,12 @@
 # npg_notifications
 
-A utility for notifying customers about lifecycle events in the analisys
+A utility for notifying customers about lifecycle events in the analysis
 and QC of sequencing data.
 
-[Porch](https://github.com/wtsi-npg/npg_porch) service is used to queue and
+[porch](https://github.com/wtsi-npg/npg_porch) service is used to queue and
 process (send) notifications. The notification producer can repeatedly send
-to `porch` the same notification. `Porch` guarantees that the repeated
-notifications are not kept and, therefor, not processed.
+to `porch` the same notification. `porch` guarantees that the repeated
+notifications are not kept and therefore not processed.
 
 The consumer of the notifications is responsible for sending the message
 to the customer. For a fully automated system the consumer should implement

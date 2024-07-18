@@ -1,6 +1,6 @@
 import configparser
-import pathlib
 import json
+import pathlib
 
 """Common utility functions for the package."""
 
@@ -14,6 +14,9 @@ def get_config_data(conf_file_path: str, conf_file_section: str = None):
     Allows for two types of configuration files, 'ini' and 'json'. The type of
     the file is determined from the extension of the file name. In case of no
     extension an 'ini' type is assumed.
+
+    The content of the file is not cached, so subsequent calls to get data from
+    the same configuration file result in re-reading and re-parsing of the file.
 
     Args:
 
@@ -33,13 +36,13 @@ def get_config_data(conf_file_path: str, conf_file_section: str = None):
       The value corresponding to this key is returned.
     """
 
-    conf_file_extention = pathlib.Path(conf_file_path).suffix
-    if conf_file_extention:
-        conf_file_extention = conf_file_extention[1:]
+    conf_file_extension = pathlib.Path(conf_file_path).suffix
+    if conf_file_extension:
+        conf_file_extension = conf_file_extension[1:]
     else:
-        conf_file_extention = DEFAULT_CONF_FILE_TYPE
+        conf_file_extension = DEFAULT_CONF_FILE_TYPE
 
-    if conf_file_extention == DEFAULT_CONF_FILE_TYPE:
+    if conf_file_extension == DEFAULT_CONF_FILE_TYPE:
         if not conf_file_section:
             raise Exception(
                 "'conf_file_section' argument is not given, "
@@ -52,7 +55,7 @@ def get_config_data(conf_file_path: str, conf_file_section: str = None):
 
         return {i[0]: i[1] for i in config[conf_file_section].items()}
 
-    elif conf_file_extention == "json":
+    elif conf_file_extension == "json":
         conf: dict = json.load(conf_file_path)
         if conf_file_section:
             if isinstance(conf, dict) is False:
@@ -68,5 +71,5 @@ def get_config_data(conf_file_path: str, conf_file_section: str = None):
 
     else:
         raise Exception(
-            f"Parsing for '{conf_file_extention}' files is not implemented"
+            f"Parsing for '{conf_file_extension}' files is not implemented"
         )
