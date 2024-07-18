@@ -109,7 +109,8 @@ def create_tasks(conf_file_path: str):
     del porch_conf["npg_porch_token"]
 
     # qc_states is a dictionary where keys are product IDs and values are
-    # lists of QC states. A list of one QC state is expected.
+    # lists of QC states. A list of one QC state is expected  because we are
+    # limiting to sequencing products only.
     num_errors = 0
     for product_id, qc_state_data in qc_states.items():
         try:
@@ -121,7 +122,8 @@ def create_tasks(conf_file_path: str):
             logger.debug(f"Created a new task {task}")
         except Exception as err:
             logger.error(
-                f"Error registering QC state for product {product_id}: {str(err)}"
+                f"Error registering task for pipeline {pipeline.name} with "
+                f"QC state change of {product_id}: {str(err)}"
             )
             num_errors += 1
 
