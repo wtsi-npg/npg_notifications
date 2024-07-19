@@ -18,20 +18,27 @@
 # You should have received a copy of the GNU General Public License along with
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
-from sqlalchemy import ForeignKey, UniqueConstraint, Integer, String, select
+from sqlalchemy import ForeignKey, Integer, String, UniqueConstraint, select
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
+    Session,
     mapped_column,
     relationship,
-    Session,
 )
-from sqlalchemy.exc import NoResultFound
 
 """
-Declarative ORM for some tables of multi-lims warehouse.
+Declarative ORM for some tables of multi-lims warehouse (mlwh) database.
 For simplicity, only columns used by this package are represented.
+
+Available ORM classes: Study, StudyUser.
+
+Utility methods: get_study_contacts.
 """
+
+"Study contacts with these roles will receive notifications."
+ROLES = ["manager", "follower", "owner"]
 
 
 class Base(DeclarativeBase):
@@ -39,6 +46,8 @@ class Base(DeclarativeBase):
 
 
 class Study(Base):
+    "A representation for the 'study' table."
+
     __tablename__ = "study"
 
     id_study_tmp = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -54,26 +63,34 @@ class Study(Base):
         ),
     )
 
-    study_users: Mapped[set["StudyUsers"]] = relationship()
+    study_users: Mapped[set["StudyUser"]] = relationship()
 
     def __repr__(self):
         return f"Study {self.id_study_lims}, {self.name}"
 
     def contacts(self) -> list[str]:
-        roles = ["manager", "follower", "owner"]
+        """Retrieves emails of contacts for this study object.
+
+        Returns:
+          A sorted list of unique emails for managers, followers or owners of
+          the study.
+        """
+
+        # In order to eliminate repetition, the comprehension expression below
+        # returns a set, which is then sorted to return a sorted list.
         return sorted(
-            list(
-                {
-                    u.email
-                    for u in self.study_users
-                    if (u.email is not None and u.role is not None)
-                    and (u.role in roles)
-                }
-            )
+            {
+                u.email
+                for u in self.study_users
+                if (u.email is not None and u.role is not None)
+                and (u.role in ROLES)
+            }
         )
 
 
-class StudyUsers(Base):
+class StudyUser(Base):
+    "A representation for the 'study_users' table."
+
     __tablename__ = "study_users"
 
     id_study_users_tmp = mapped_column(
@@ -94,10 +111,29 @@ class StudyUsers(Base):
 
 
 class StudyNotFoundError(Exception):
+    "An error to use when a study does not exist in mlwh."
+
     pass
 
 
-def get_study_contacts(session: Session, id: str):
+def get_study_contacts(session: Session, id: str) -> list[str]:
+    """Retrieves emails of study contacts from the mlwh database.
+
+    Args:
+      session:
+        sqlalchemy.orm.Session object
+      id:
+        String study ID.
+
+    Returns:
+      A sorted list of unique emails for managers, followers or owners of
+      the study.
+
+    Example:
+
+      from npg_notify.db.mlwh get_study_contacts
+      contact_emails = get_study_contacts(session=session, id="5901")
+    """
     try:
         contacts = (
             session.execute(select(Study).where(Study.id_study_lims == id))
@@ -106,7 +142,7 @@ def get_study_contacts(session: Session, id: str):
         )
     except NoResultFound:
         raise StudyNotFoundError(
-            f"Study with ID {id} is not found in mlwarehouse"
+            f"Study with ID {id} is not found in ml warehouse"
         )
 
     return contacts

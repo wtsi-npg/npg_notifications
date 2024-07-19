@@ -1,12 +1,11 @@
 import pytest
-
-from npg_notify.db.mlwh import get_study_contacts, StudyNotFoundError
+from npg_notify.db.mlwh import StudyNotFoundError, get_study_contacts
 
 
 def test_retrieving_study_contacts(mlwh_test_session):
     with pytest.raises(
         StudyNotFoundError,
-        match=r"Study with ID 666 is not found in mlwarehouse",
+        match=r"Study with ID 666 is not found in ml warehouse",
     ):
         get_study_contacts(mlwh_test_session, "666")
 
