@@ -17,3 +17,27 @@ have to be sent for the same event, it is advised either to use a separate
 `porch` pipeline for each type of notification or to include additional
 information about the notification protocol and format into the payload that
 is sent to `porch`.
+
+## Scope
+
+The current version implements notifications for PacBio sequencing platform
+customers.
+
+## Running the scripts
+
+To register recently QC-ed entities as tasks with `porch`
+
+```bash
+qc_state_notification register --conf_file_path path/to/qc_state_app_config.ini
+```
+
+To process one `porch` task
+
+```bash
+qc_state_notification process --conf_file_path path/to/qc_state_app_config.ini
+```
+
+Processing includes claiming one task, sending per-study emails and updating the
+status of the `porch` task to `DONE`.
+
+The test data directory has an example of a [configuration file](tests/data/qc_state_app_config.ini).
