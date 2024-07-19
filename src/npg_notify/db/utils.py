@@ -1,21 +1,20 @@
-import os
 import importlib
+import os
 import pathlib
 import re
-import yaml
-
 from contextlib import contextmanager
 
-from sqlalchemy import create_engine, text, insert
+import yaml
+from sqlalchemy import create_engine, insert, text
 from sqlalchemy.engine import Engine
-from sqlalchemy.orm import Session, DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, Session
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
 from npg_notify.config import get_config_data
 
 
-def db_credentials_from_config_file(
-    conf_file_path: str, conf_file_section: str = None
+def get_db_connection_string(
+    conf_file_path: str, conf_file_section: str | None = None
 ):
     """Parses a configuration file, generates a database connection string.
 
@@ -23,7 +22,8 @@ def db_credentials_from_config_file(
       conf_file_path:
         A configuration file with database connection details.
       conf_file_section:
-        The section of the configuration file. Optional.
+        The section of the configuration file. Is needed for the INI
+        configuration file format, otherwise optional.
 
     Returns:
       MySQL connection string suitable for SQLAchemy
@@ -44,41 +44,6 @@ def db_credentials_from_config_file(
         f"mysql+pymysql://{user_creds}@"
         f"{config['dbhost']}:{config['dbport']}/{config['dbschema']}?charset=utf8mb4"
     )
-
-
-def get_db_connection_string(
-    conf_file_path: str, conf_file_section: str = None
-):
-    """Generates a database connection string from supplied database credentials.
-
-    Args:
-      conf_file_path:
-        A configuration file with database connection details. If the
-        configuration file does not exist, assumes that the value is the name
-        of the environment variable that holds the database connection string.
-      conf_file_section:
-        The section of the configuration file. Optional.
-
-    Returns:
-      MySQL connection string suitable for SQLAchemy
-    """
-    try:
-        if os.path.exists(conf_file_path):
-            url = db_credentials_from_config_file(
-                conf_file_path, conf_file_section
-            )
-        else:
-            url = os.environ.get("conf_file_path")
-            if url is None or url == "":
-                raise Exception(
-                    f"{conf_file_path} is not a file path, neither it is a defined env. variable"
-                )
-    except Exception as err:
-        raise Exception(
-            "Failed to get db credentials: " + str(err.with_traceback(None))
-        )
-
-    return url
 
 
 @contextmanager
@@ -201,9 +166,9 @@ def batch_load_from_yaml(
     for file_path in file_paths:
         with open(file_path, "r") as f:
             (head, file_name) = os.path.split(file_path)
-            # File name example: 200-PacBioRun.yml
+            # File name example: 200-StudyUser.yml
             m = re.match(r"\A\d+-([a-zA-Z]+)\.yml\Z", file_name)
-            if m is not None:
+            if m:
                 class_name = m.group(1)
                 table_class = getattr(module, class_name)
                 data = yaml.safe_load(f)
