@@ -69,7 +69,7 @@ def send_notification(
         logger.warning(reply)
 
 
-def generate_email(
+def generate_email_pac_bio(
     domain: str,
     langqc_run_url: str,
     irods_docs_url: str,
@@ -78,6 +78,8 @@ def generate_email(
     libraries: list,
 ) -> tuple[str, str]:
     """Generates the subject line and the content for a notification.
+
+    This code is specific for the PacBio platform.
 
     Args:
       domain:
@@ -92,12 +94,19 @@ def generate_email(
       well_data:
         A dictionary representing information about a well.
       libraries:
-        A list of dictionaries, which represent individual samples.
+        A list of dictionaries, which represent individual libraries.
+        All libraries in this list should belong to the same study.
 
     Returns:
       A tuple of two strings, the subject line and the content for the
       email notification.
     """
+    study_ids = {lib["study_id"] for lib in libraries}
+    if len(study_ids) != 1:
+        raise ValueError(
+            "Libraries from different studies in 'libraries' attribute"
+        )
+
     run_name = well_data["run_name"]
     plate_number = (
         well_data["plate_number"] if well_data["plate_number"] else "n/a"
@@ -105,7 +114,8 @@ def generate_email(
     outcome = "Undefined"
     if qc_outcome["outcome"] is not None:
         outcome = "Pass" if qc_outcome["outcome"] is True else "Fail"
-    study_id = libraries[0]["study_id"]
+
+    study_id = study_ids.pop()
     study_name = libraries[0]["study_name"]
 
     subject = f"Study {study_id}: PacBio data is available"

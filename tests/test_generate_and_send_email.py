@@ -1,6 +1,7 @@
 import random
 
-from npg_notify.mail import generate_email
+import pytest
+from npg_notify.mail import generate_email_pac_bio
 
 domain = "langqc.com"
 langqc_run_url = "https://langqc.com/ui/run"
@@ -64,7 +65,7 @@ def test_generate_email_one_library():
         }
     ]
 
-    (subject, generated_content) = generate_email(
+    (subject, generated_content) = generate_email_pac_bio(
         domain=domain,
         langqc_run_url=langqc_run_url,
         irods_docs_url=irods_docs_url,
@@ -92,7 +93,7 @@ def test_generate_email_one_library():
 
     qc_outcome["outcome"] = None
     qc_outcome["qc_state"] = "Nobody can tell"
-    (subject, generated_content) = generate_email(
+    (subject, generated_content) = generate_email_pac_bio(
         domain=domain,
         langqc_run_url=langqc_run_url,
         irods_docs_url=irods_docs_url,
@@ -144,7 +145,7 @@ def test_generate_email_two_libraries():
         for i in range(0, 5)
     ]
 
-    (subject, generated_content) = generate_email(
+    (subject, generated_content) = generate_email_pac_bio(
         domain=domain,
         langqc_run_url=langqc_run_url,
         irods_docs_url=irods_docs_url,
@@ -197,7 +198,7 @@ def test_generate_email_seven_libraries():
         for i in range(0, 7)
     ]
 
-    (subject, generated_content) = generate_email(
+    (subject, generated_content) = generate_email_pac_bio(
         domain=domain,
         langqc_run_url=langqc_run_url,
         irods_docs_url=irods_docs_url,
@@ -227,3 +228,17 @@ def test_generate_email_seven_libraries():
     assert generated_content == (
         content + footer.replace("TRACTION-RUN", "TRACTION-RUN-1333")
     )
+
+    libraries[3]["study_id"] = "12345"
+    with pytest.raises(
+        ValueError,
+        match=r"Libraries from different studies in 'libraries' attribute",
+    ):
+        generate_email_pac_bio(
+            domain=domain,
+            langqc_run_url=langqc_run_url,
+            irods_docs_url=irods_docs_url,
+            qc_outcome=qc_outcome,
+            well_data=get_well_data(libraries),
+            libraries=libraries,
+        )

@@ -10,7 +10,7 @@ from urllib.parse import urljoin
 from npg_notify.config import get_config_data
 from npg_notify.db.mlwh import get_study_contacts
 from npg_notify.db.utils import db_credentials_from_config_file, get_connection
-from npg_notify.mail import generate_email, send_notification
+from npg_notify.mail import generate_email_pac_bio, send_notification
 from npg_porch_cli import send_request
 from npg_porch_cli.api import Pipeline, PorchAction
 from npg_porch_cli.api import send as send_porch_request
@@ -284,7 +284,7 @@ def process_task(conf_file_path):
                 continue
 
             try:
-                (subject, text) = generate_email(
+                (subject, text) = generate_email_pac_bio(
                     domain=domain,
                     langqc_run_url=urljoin(
                         langqc_base_url, pac_bio_run_iu_url
