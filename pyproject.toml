@@ -26,6 +26,12 @@ ruff = "^0.4.9"
 # Set the maximum line length to 79.
 line-length = 79
 
+[tool.ruff.lint]
+select = [
+    # flake8
+    "W",
+]
+
 [tool.pytest.ini_options]
 addopts = [
     "--import-mode=importlib",

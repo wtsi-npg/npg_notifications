@@ -240,7 +240,7 @@ def process_task(conf_file_path) -> bool:
     product_id = claimed_task["task_input"]["id_product"]
     try:
         url = re.sub(
-            "\[\w+\]",
+            r"\[\w+\]",
             product_id,
             pac_bio_well_libraries_path,
         )
