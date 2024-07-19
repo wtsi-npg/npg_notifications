@@ -9,7 +9,7 @@ from urllib.parse import urljoin
 
 from npg_notify.config import get_config_data
 from npg_notify.db.mlwh import get_study_contacts
-from npg_notify.db.utils import db_credentials_from_config_file, get_connection
+from npg_notify.db.utils import get_connection, get_db_connection_string
 from npg_notify.mail import generate_email_pac_bio, send_notification
 from npg_porch_cli import send_request
 from npg_porch_cli.api import Pipeline, PorchAction
@@ -68,7 +68,7 @@ def run():
     exit(0 if success else 1)
 
 
-def create_tasks(conf_file_path: str):
+def create_tasks(conf_file_path: str) -> bool:
     """Retrieves and registers with Porch recently assigned QC states.
 
     Retrieves from LangQC API all recently (within the last four weeks) assigned
@@ -97,7 +97,7 @@ def create_tasks(conf_file_path: str):
     )
     qc_states = send_request(
         validate_ca_cert=_validate_ca_cert(),
-        url=urljoin(langqc_conf["api_url"], langqc_conf["recently_qced_url"]),
+        url=urljoin(langqc_conf["api_url"], langqc_conf["recently_qced_path"]),
         method="GET",
         auth_type=None,
     )
@@ -105,8 +105,7 @@ def create_tasks(conf_file_path: str):
     num_products = len(qc_states)
     logger.info(f"Retrieved QC states for {num_products} products.")
 
-    os.environ["NPG_PORCH_TOKEN"] = porch_conf["npg_porch_token"]
-    del porch_conf["npg_porch_token"]
+    os.environ["NPG_PORCH_TOKEN"] = porch_conf.pop("npg_porch_token")
 
     # qc_states is a dictionary where keys are product IDs and values are
     # lists of QC states. A list of one QC state is expected  because we are
@@ -161,7 +160,7 @@ def create_task(
     send_porch_request(action=action, pipeline=pipeline)
 
 
-def process_task(conf_file_path):
+def process_task(conf_file_path) -> bool:
     """Processes one task for the email notification pipeline.
 
     Performs the following steps:
@@ -209,13 +208,13 @@ def process_task(conf_file_path):
 
     # Get all config data or error before claiming the task.
     porch_api_url = porch_config["api_url"]
-    pac_bio_well_libraries_url = langqc_conf["pac_bio_well_libraries_url"]
+    pac_bio_well_libraries_path = langqc_conf["pac_bio_well_libraries_path"]
     langqc_base_url = langqc_conf["api_url"]
-    pac_bio_run_iu_url = langqc_conf["pac_bio_run_iu_url"]
+    pac_bio_run_iu_path = langqc_conf["pac_bio_run_iu_path"]
     irods_docs_url = irods_config["user_manual_url"]
     domain = mail_config["domain"]
     # Check that database credentials are in place
-    db_credentials_from_config_file(
+    get_db_connection_string(
         conf_file_path=conf_file_path, conf_file_section="MySQL MLWH"
     )
 
@@ -243,7 +242,7 @@ def process_task(conf_file_path):
         url = re.sub(
             "\[\w+\]",
             product_id,
-            pac_bio_well_libraries_url,
+            pac_bio_well_libraries_path,
         )
         url = urljoin(langqc_base_url, url)
         response = send_request(
@@ -287,7 +286,7 @@ def process_task(conf_file_path):
                 (subject, text) = generate_email_pac_bio(
                     domain=domain,
                     langqc_run_url=urljoin(
-                        langqc_base_url, pac_bio_run_iu_url
+                        langqc_base_url, pac_bio_run_iu_path
                     ),
                     irods_docs_url=irods_docs_url,
                     qc_outcome=task_input,
