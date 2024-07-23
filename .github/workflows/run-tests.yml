@@ -1,0 +1,55 @@
+name: Test
+
+on:
+  push:
+    branches: [master, devel]
+  pull_request:
+    branches: [master, devel] 
+
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: "mysql:8.0"
+        ports:
+          - "3306:3306"
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+        env:
+          MYSQL_RANDOM_ROOT_PASSWORD: yes
+          MYSQL_TCP_PORT: 3306
+          MYSQL_USER: "test"
+          MYSQL_PASSWORD: "test"
+          MYSQL_DATABASE: "study_notify"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Poetry
+        run: |
+          pipx install poetry
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          architecture: 'x64'
+
+      - name: Run poetry install
+        run: |
+          poetry env use '3.11'
+          poetry install
+
+      - name: Run pytest
+        run: |
+          poetry run pytest
+
+      - name: Run linter (ruff)
+        run: |
+          poetry run ruff check --output-format=github .
+
