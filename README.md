@@ -28,13 +28,13 @@ customers.
 To register recently QC-ed entities as tasks with `porch`
 
 ```bash
-qc_state_notification register --conf_file_path path/to/qc_state_app_config.ini
+npg_qc_state_notification register --conf_file_path path/to/qc_state_app_config.ini
 ```
 
 To process one `porch` task
 
 ```bash
-qc_state_notification process --conf_file_path path/to/qc_state_app_config.ini
+npg_qc_state_notification process --conf_file_path path/to/qc_state_app_config.ini
 ```
 
 Processing includes claiming one task, sending per-study emails and updating the
