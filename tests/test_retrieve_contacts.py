@@ -9,8 +9,8 @@ def test_retrieving_study_contacts(mlwh_test_session):
     ):
         get_study_contacts(mlwh_test_session, "666")
 
-    for id in ["2", "5", "4"]:
-        assert get_study_contacts(mlwh_test_session, id) == []
+    for study_id in ["2", "5", "4"]:
+        assert get_study_contacts(mlwh_test_session, study_id) == []
 
     users = ["owner", "user1", "user2", "user3"]
     assert get_study_contacts(mlwh_test_session, "3") == [
