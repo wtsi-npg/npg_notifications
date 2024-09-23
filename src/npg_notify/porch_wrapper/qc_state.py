@@ -15,6 +15,7 @@ from npg_porch_cli import send_request
 from npg_porch_cli.api import Pipeline, PorchAction
 from npg_porch_cli.api import send as send_porch_request
 
+
 SSL_CONFIG_FILE_SECTION = "SSL"
 LANGQC_CONFIG_FILE_SECTION = "LANGQC"
 PORCH_CONFIG_FILE_SECTION = "PORCH"
@@ -113,12 +114,11 @@ def create_tasks(conf_file_path: str) -> bool:
     num_errors = 0
     for product_id, qc_state_data in qc_states.items():
         try:
-            task = create_task(
+            create_task(
                 porch_config=porch_conf,
                 pipeline=pipeline,
                 qc_state=qc_state_data[0],
             )
-            logger.debug(f"Created a new task {task}")
         except Exception as err:
             logger.error(
                 f"Error registering task for pipeline {pipeline.name} with "
