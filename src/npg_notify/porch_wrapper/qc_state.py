@@ -267,7 +267,7 @@ def process_task(conf_file_path) -> bool:
         ) as session:
             for study_id in study_ids:
                 contacts_per_study[study_id] = get_study_contacts(
-                    session=session, id=study_id
+                    session=session, study_id=study_id
                 )
 
     except Exception as err:

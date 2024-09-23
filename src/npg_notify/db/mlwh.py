@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License along with
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
-from sqlalchemy import ForeignKey, Integer, String, UniqueConstraint, select
+from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint, select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import (
     DeclarativeBase,
@@ -46,7 +46,7 @@ class Base(DeclarativeBase):
 
 
 class Study(Base):
-    "A representation for the 'study' table."
+    """A representation for the 'study' table."""
 
     __tablename__ = "study"
 
@@ -89,7 +89,7 @@ class Study(Base):
 
 
 class StudyUser(Base):
-    "A representation for the 'study_users' table."
+    """A representation for the 'study_users' table."""
 
     __tablename__ = "study_users"
 
@@ -111,18 +111,18 @@ class StudyUser(Base):
 
 
 class StudyNotFoundError(Exception):
-    "An error to use when a study does not exist in mlwh."
+    """An error to use when a study does not exist in mlwh."""
 
     pass
 
 
-def get_study_contacts(session: Session, id: str) -> list[str]:
+def get_study_contacts(session: Session, study_id: str) -> list[str]:
     """Retrieves emails of study contacts from the mlwh database.
 
     Args:
       session:
         sqlalchemy.orm.Session object
-      id:
+      study_id:
         String study ID.
 
     Returns:
@@ -136,13 +136,13 @@ def get_study_contacts(session: Session, id: str) -> list[str]:
     """
     try:
         contacts = (
-            session.execute(select(Study).where(Study.id_study_lims == id))
+            session.execute(select(Study).where(Study.id_study_lims == study_id))
             .scalar_one()
             .contacts()
         )
     except NoResultFound:
         raise StudyNotFoundError(
-            f"Study with ID {id} is not found in ml warehouse"
+            f"Study with ID {study_id} is not found in ml warehouse"
         )
 
     return contacts
