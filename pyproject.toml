@@ -1,13 +1,14 @@
 [tool.poetry]
 name = "npg_notify"
-version = "0.0.1"
 description = "Utility for client notifications"
+version = "0.0.0"
 authors = ["Marina Gourtovaia"]
 license = "GPL-3.0-or-later"
 readme = "README.md"
 
 [tool.poetry.scripts]
-npg_qc_state_notification = "npg_notify.porch_wrapper.qc_state:run" 
+npg_qc_state_notification = "npg_notify.porch_wrapper.qc_state:run"
+npg_ont_event_notification = "npg_notify.ont.event:main"
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -16,15 +17,25 @@ SQLAlchemy-Utils = "^0.41.2"
 cryptography = "^41.0.3"
 PyYAML = "^6.0.0"
 npg_porch_cli = { git="https://github.com/wtsi-npg/npg_porch_cli.git", tag="0.1.0" }
+partisan = { url = "https://github.com/wtsi-npg/partisan/releases/download/2.13.0/partisan-2.13.0.tar.gz" }
+npg-python-lib = { url = "https://github.com/wtsi-npg/npg-python-lib/releases/download/0.3.2/npg_python_lib-0.3.2.tar.gz" }
+requests = "^2.32.0"
+structlog = "^24.4.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^8.2.2"
+pytest-it = "^0.1.5"
 requests-mock = "^1.12.1"
 ruff = "^0.4.9"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+build-backend = "poetry_dynamic_versioning.backend"
+
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
+pattern = "default-unprefixed"
 
 [tool.ruff]
 # Set the maximum line length to 79.
