@@ -280,7 +280,7 @@ def run_email_tasks(
         number of errors encountered.
     """
     np = ns = ne = 0
-    batch_size = 1
+    batch_size = 100
 
     for task in pipeline.claim(batch_size):
         try:
