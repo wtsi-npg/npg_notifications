@@ -8,6 +8,8 @@ from npg_notify.ont.event import ContactEmail, EventType
 @m.describe("Generate ONT email")
 class TestGenerateONTEmail:
 
+    @m.context("When an ONT event is serialized and deserialized")
+    @m.it("Retains the correct values")
     def test_serialize_deserialize_event(self):
         expt = "experiment1"
         slot = 1
@@ -26,6 +28,7 @@ class TestGenerateONTEmail:
         event2 = ContactEmail.from_serializable(
             json.loads(json.dumps(event1.to_serializable()))
         )
+
         assert event2.experiment_name == expt
         assert event2.instrument_slot == slot
         assert event2.flowcell_id == flowcell_id
@@ -33,7 +36,7 @@ class TestGenerateONTEmail:
         assert event2.event == event_type
 
     @m.context("When an ONT email is generated")
-    @m.it("Has the correct subject")
+    @m.it("Has the correct subject and body")
     def test_generate_email(self):
         expt = "experiment1"
         slot = 1
