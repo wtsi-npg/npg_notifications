@@ -16,7 +16,7 @@ services:
       retries: 10
 
   porch-server:
-    image: wsinpg/python-3.10-npg-porch-2.0.0:latest
+    image: "ghcr.io/wtsi-npg/python-3.10-npg-porch-2.0.0"
     restart: always
     ports:
       - "127.0.0.1:8081:8081"
