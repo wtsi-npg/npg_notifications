@@ -4,7 +4,7 @@
 #   Marina Gourtovaia <mg8@sanger.ac.uk>
 #   Kieron Taylor <kt19@sanger.ac.uk>
 #
-# This file is part of npg_notifications software package..
+# This file is part of npg_notifications software package.
 #
 # npg_notifications is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
@@ -45,6 +45,39 @@ class Base(DeclarativeBase):
     pass
 
 
+class Sample(Base):
+    __tablename__ = "sample"
+
+    id_sample_tmp = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id_lims = mapped_column(String(10), nullable=False)
+    id_sample_lims = mapped_column(String(20), nullable=False)
+    created = mapped_column(DateTime, nullable=False)
+    last_updated = mapped_column(DateTime, nullable=False)
+    recorded_at = mapped_column(DateTime, nullable=False)
+    consent_withdrawn = mapped_column(Integer, nullable=False, default=0)
+    name = mapped_column(String(255), index=True)
+    organism = mapped_column(String(255))
+    accession_number = mapped_column(String(50), index=True)
+    common_name = mapped_column(String(255))
+    cohort = mapped_column(String(255))
+    sanger_sample_id = mapped_column(String(255), index=True)
+    supplier_name = mapped_column(String(255), index=True)
+    public_name = mapped_column(String(255))
+    donor_id = mapped_column(String(255))
+    date_of_consent_withdrawn = mapped_column(DateTime)
+    marked_as_consent_withdrawn_by = mapped_column(String(255))
+
+    oseq_flowcell: Mapped["OseqFlowcell"] = relationship(
+        "OseqFlowcell", back_populates="sample"
+    )
+
+    def __repr__(self):
+        return (
+            f"<Sample pk={self.id_sample_tmp} id_sample_lims={self.id_sample_lims} "
+            f"name='{self.name}'>"
+        )
+
+
 class Study(Base):
     """A representation for the 'study' table."""
 
@@ -63,6 +96,9 @@ class Study(Base):
         ),
     )
 
+    oseq_flowcell: Mapped["OseqFlowcell"] = relationship(
+        "OseqFlowcell", back_populates="study"
+    )
     study_users: Mapped[set["StudyUser"]] = relationship()
 
     def __repr__(self):
@@ -114,6 +150,47 @@ class StudyNotFoundError(Exception):
     """An error to use when a study does not exist in mlwh."""
 
     pass
+
+
+class OseqFlowcell(Base):
+    __tablename__ = "oseq_flowcell"
+
+    id_oseq_flowcell_tmp = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id_flowcell_lims = mapped_column(String(255), nullable=False)
+    last_updated = mapped_column(DateTime, nullable=False)
+    recorded_at = mapped_column(DateTime, nullable=False)
+    id_sample_tmp = mapped_column(
+        ForeignKey("sample.id_sample_tmp"), nullable=False, index=True
+    )
+    id_study_tmp = mapped_column(
+        ForeignKey("study.id_study_tmp"), nullable=False, index=True
+    )
+    experiment_name = mapped_column(String(255), nullable=False)
+    instrument_name = mapped_column(String(255), nullable=False)
+    instrument_slot = mapped_column(Integer, nullable=False)
+    id_lims = mapped_column(String(10), nullable=False)
+    pipeline_id_lims = mapped_column(String(255))
+    requested_data_type = mapped_column(String(255))
+    tag_identifier = mapped_column(String(255))
+    tag_sequence = mapped_column(String(255))
+    tag_set_id_lims = mapped_column(String(255))
+    tag_set_name = mapped_column(String(255))
+    tag2_identifier = mapped_column(String(255))
+    tag2_sequence = mapped_column(String(255))
+    tag2_set_id_lims = mapped_column(String(255))
+    tag2_set_name = mapped_column(String(255))
+    flowcell_id = mapped_column(String(255))
+    run_id = mapped_column(String(255))
+
+    sample: Mapped["Sample"] = relationship("Sample", back_populates="oseq_flowcell")
+    study: Mapped["Study"] = relationship("Study", back_populates="oseq_flowcell")
+
+    def __repr__(self):
+        return (
+            f"<OseqFlowcell expt_name={self.experiment_name} "
+            f"slot={self.instrument_slot} "
+            f"flowcell={self.flowcell_id}>"
+        )
 
 
 def get_study_contacts(session: Session, study_id: str) -> list[str]:

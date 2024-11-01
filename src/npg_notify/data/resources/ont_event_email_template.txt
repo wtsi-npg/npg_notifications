@@ -1,0 +1,9 @@
+The ONT run for experiment $experiment_name, flowcell $flowcell_id has been $event.
+The data are available in iRODS at the following path:
+
+$path
+
+This is an automated email from NPG. You are receiving it because you are registered
+as a contact for one or more of the Studies listed below:
+
+$studies
