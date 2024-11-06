@@ -2,6 +2,7 @@ import json
 
 from pytest import mark as m
 
+from npg_notify.db.mlwh import Study
 from npg_notify.ont.event import ContactEmail, EventType
 
 
@@ -43,7 +44,7 @@ class TestGenerateONTEmail:
         flowcell_id = "FAKE12345"
         path = f"/testZone/home/irods/{expt}_{slot}_{flowcell_id}"
         event_type = EventType.UPLOADED
-        studies = ["study1", "study2"]
+        studies = [Study(name="study1"), Study(name="study2")]
 
         event = ContactEmail(
             experiment_name=expt,
@@ -58,16 +59,15 @@ class TestGenerateONTEmail:
             == f"Update: ONT run {expt} flowcell {flowcell_id} has been {event_type}"
         )
 
-        study_lines = "\n".join(studies)
+        study_descs = [f"{s.id_study_lims} ({s.name})" for s in studies]
+        study_lines = "\n".join(study_descs)
 
-        assert event.body(*studies) == (
-            f"The ONT run for experiment {expt}, flowcell {flowcell_id} has been {event_type}.\n"
-            "The data are available in iRODS at the following path:\n"
+        assert event.body(studies) == (
+            f"The ONT run for experiment {expt}, flowcell {flowcell_id} has been {event_type}. The data are available in iRODS at the following path:\n"
             "\n"
             f"{path}\n"
             "\n"
-            "This is an automated email from NPG. You are receiving it because you are registered\n"
-            "as a contact for one or more of the Studies listed below:\n"
+            "This is an automated email from NPG. You are receiving it because you are registered as a contact for one or more of the Studies listed below:\n"
             "\n"
             f"{study_lines}\n"
         )

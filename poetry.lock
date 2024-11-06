@@ -405,16 +405,16 @@ requests = "^2.31.0"
 type = "git"
 url = "https://github.com/wtsi-npg/npg_porch_cli.git"
 reference = "0.1.0"
-resolved_reference = "31e1371051d5b98a50a633d6b0d05d4fdd6a60d5"
+resolved_reference = "5f463f74fb915b8a9fd87138c138fb1e1b5162aa"
 
 [[package]]
 name = "npg-python-lib"
-version = "0.3.2"
+version = "0.3.4"
 description = "A library of Python functions and classes common to NPG applications."
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "npg_python_lib-0.3.2.tar.gz", hash = "sha256:c30a9d28fd54e45eab64c4561036cf4a770b483d89b9949ecf282090b136af5a"},
+    {file = "npg_python_lib-0.3.4.tar.gz", hash = "sha256:02cdd0659f91680a9ed160d538548722e070d6f0bd51548b0ea7ffd90458b6cb"},
 ]
 
 [package.dependencies]
@@ -426,7 +426,7 @@ test = ["black (>=24.3.0,<25)", "pytest (>=8.0,<9)", "pytest-it (>=0.1.5)"]
 
 [package.source]
 type = "url"
-url = "https://github.com/wtsi-npg/npg-python-lib/releases/download/0.3.2/npg_python_lib-0.3.2.tar.gz"
+url = "https://github.com/wtsi-npg/npg-python-lib/releases/download/0.3.4/npg_python_lib-0.3.4.tar.gz"
 
 [[package]]
 name = "packaging"
@@ -856,4 +856,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "69f5d8c5817f08543331022fe3b73a4072778628bf252e432a1e156923d6e559"
+content-hash = "5ca0265e080baeb760d922e18416a0c9636bfe5ac37e3310d3e76e17dd4490d1"

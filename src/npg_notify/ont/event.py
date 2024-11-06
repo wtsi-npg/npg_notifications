@@ -21,6 +21,7 @@ from dataclasses import dataclass
 from enum import Enum
 from importlib import resources
 from string import Template
+from typing import Type
 
 from npg.cli import add_io_arguments, add_logging_arguments
 from npg.conf import IniData
@@ -79,6 +80,9 @@ file should be in INI format and have the following sections:
     user = <MySQL user>
     password = <MySQL password>
     db = <MySQL database>
+
+    [MAIL]
+    domain = <email FQDN>
 """
 
 
@@ -167,15 +171,18 @@ class ContactEmail(Task):
             f"has been {self.event}"
         )
 
-    def body(self, *study_ids: list[str]) -> str:
+    def body(self, studies: list[Study]) -> str:
         """Return the body of the email.
 
         Args:
-            *study_ids: The study IDs associated with the run.
+            studies: The studies associated with the run.
         """
         source = resources.files("npg_notify.data.resources").joinpath(
             "ont_event_email_template.txt"
         )
+
+        study_descs = [f"{s.id_study_lims} ({s.name})" for s in studies]
+
         with resources.as_file(source) as template:
             with open(template) as f:
                 t = Template(f.read())
@@ -185,7 +192,7 @@ class ContactEmail(Task):
                         "flowcell_id": self.flowcell_id,
                         "path": self.path,
                         "event": self.event,
-                        "studies": "\n".join([*study_ids]),
+                        "studies": "\n".join([*study_descs]),
                     }
                 )
 
@@ -201,6 +208,14 @@ class ContactEmail(Task):
     @classmethod
     def from_serializable(cls, serializable: dict):
         return cls(**serializable)
+
+    def __str__(self):
+        return (
+            f"<ONT experiment: {self.experiment_name} "
+            f"instrument slot: {self.instrument_slot} "
+            f"flowcell ID: {self.flowcell_id} "
+            f"event: {self.event}>"
+        )
 
 
 def add_email_tasks(
@@ -285,22 +300,30 @@ def run_email_tasks(
     for task in pipeline.claim(batch_size):
         try:
             np += 1
-            study_ids = find_studies_for_run(
+            studies = find_studies_for_run(
                 session, task.experiment_name, task.instrument_slot, task.flowcell_id
             )
 
             # We are sending a single email to all contacts of all studies in the run
             contacts = set()
-            for study_id in study_ids:
-                c = get_study_contacts(session=session, study_id=study_id)
+            for study in studies:
+                c = get_study_contacts(session=session, study_id=study.id_study_lims)
                 contacts.update(c)
+
+            log.info(
+                "Preparing email",
+                pipeline=pipeline,
+                task=task,
+                studies=[s.id_study_lims for s in studies],
+                contacts=contacts,
+            )
 
             if len(contacts) == 0:
                 log.info(
                     "No contacts found",
                     pipeline=pipeline,
                     task=task,
-                    study_ids=study_ids,
+                    studies=studies,
                 )
 
                 pipeline.done(task)
@@ -312,7 +335,7 @@ def run_email_tasks(
                     domain=domain,
                     contacts=sorted(contacts),
                     subject=task.subject(),
-                    content=task.body(study_ids),
+                    content=task.body(studies),
                 )
 
                 pipeline.done(task)
@@ -341,8 +364,9 @@ def run_email_tasks(
 
 def find_studies_for_run(
     session: Session, experiment_name: str, instrument_slot: int, flowcell_id: str
-) -> list[str]:
-    """Return the study IDs associated with an ONT run.
+) -> list[Type[Study]]:
+    """Return the studies associated with an ONT run, ordered by ascending
+    id_study_lims.
 
     Args:
         session: An open MLWH DB session.
@@ -351,11 +375,10 @@ def find_studies_for_run(
         flowcell_id: The flowcell ID.
 
     Returns:
-        Study IDs associated with the run.
+        Studies associated with the run.
     """
-    return [
-        elt
-        for elt, in session.query(distinct(Study.id_study_lims))
+    return (
+        session.query(Study)
         .join(OseqFlowcell)
         .filter(
             OseqFlowcell.experiment_name == experiment_name,
@@ -364,7 +387,13 @@ def find_studies_for_run(
         )
         .order_by(asc(Study.id_study_lims))
         .all()
-    ]
+    )
+
+
+@dataclass
+class EmailConfig:
+    domain: str
+    """The domain name to use when sending email. The main will be sent from mail.<domain>"""
 
 
 def main():
@@ -378,9 +407,15 @@ def main():
         help="The 'add' action acts as a producer by sending new notification "
         "tasks to the Porch server. The 'run' action acts as a consumer "
         "by retrieving any notification tasks that have not been done and "
-        "running them to send notifications.",
-        choices=["add", "run"],
-        # nargs="?",
+        "running them to send notifications."
+        ""
+        "The remaining actions are for administrative purposes and require an admin "
+        "token to be set in the configuration file."
+        "The 'register' action registers the pipeline with the Porch server. It must "
+        "be run once, before any tasks can be added or run. The 'token' action "
+        "generates a new token for the pipeline. This token is used to authenticate "
+        "the pipeline with the Porch server.",
+        choices=["add", "run", "register", "token"],
     )
     parser.add_argument(
         "--event",
@@ -416,14 +451,15 @@ def main():
     )
 
     config_file = args.conf_file_path
-    config = IniData(Pipeline.ServerConfig).from_file(config_file, "PORCH")
+    pipeline_config = IniData(Pipeline.ServerConfig).from_file(config_file, "PORCH")
+    email_config = IniData(EmailConfig).from_file(config_file, "MAIL")
 
     pipeline = Pipeline(
         ContactEmail,
         name="ont-event-email",
         uri="https://github.com/wtsi/npg_notifications.git",
         version=npg_notify.version(),
-        config=config,
+        config=pipeline_config,
     )
 
     num_processed, num_succeeded, num_errors = 0, 0, 0
@@ -437,8 +473,14 @@ def main():
     elif action == "run":
         with get_connection(config_file, MYSQL_MLWH_CONFIG_FILE_SECTION) as session:
             num_processed, num_succeeded, num_errors = run_email_tasks(
-                pipeline, session
+                pipeline, session, email_config.domain
             )
+    elif action == "register":
+        pipeline.register()
+    elif action == "token":
+        print(pipeline.new_token("ont-event-email"))
+    else:
+        raise ValueError(f"Unknown action: {action}")
 
     if num_errors > 0:
         log.error(
