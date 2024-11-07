@@ -171,12 +171,17 @@ class ContactEmail(Task):
             f"has been {self.event}"
         )
 
-    def body(self, studies: list[Study]) -> str:
+    def body(self, studies: list[Study], domain: str = None) -> str:
         """Return the body of the email.
 
         Args:
             studies: The studies associated with the run.
+            domain: A network domain name to use when sending email. The main will
+                be sent from mail.<domain> with <user>@<domain> in the From: header.
         """
+        if domain is None:
+            raise ValueError("domain is required")
+
         source = resources.files("npg_notify.data.resources").joinpath(
             "ont_event_email_template.txt"
         )
@@ -193,6 +198,7 @@ class ContactEmail(Task):
                         "path": self.path,
                         "event": self.event,
                         "studies": "\n".join(study_descs),
+                        "domain": domain,
                     }
                 )
 
