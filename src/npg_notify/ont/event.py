@@ -192,7 +192,7 @@ class ContactEmail(Task):
                         "flowcell_id": self.flowcell_id,
                         "path": self.path,
                         "event": self.event,
-                        "studies": "\n".join([*study_descs]),
+                        "studies": "\n".join(study_descs),
                     }
                 )
 
