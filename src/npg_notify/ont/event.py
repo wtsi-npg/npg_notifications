@@ -70,16 +70,17 @@ The application requires a configuration file that specifies the Porch server UR
 authentication token, and the MySQL MLWH database connection details. The configuration
 file should be in INI format and have the following sections:
 
+    [MySQL MLWH]
+    dbhost = <MySQL host>
+    dbport = <MySQL port>
+    dbuser = <MySQL user>
+    dbpassword = <MySQL password>
+    dbschema = <MySQL schema>
+
     [PORCH]
     url = <Porch server URL>
-    token = <Porch server authentication token>
-
-    [MySQL MLWH]
-    host = <MySQL host>
-    port = <MySQL port>
-    user = <MySQL user>
-    password = <MySQL password>
-    db = <MySQL database>
+    admin_token = <Porch server admin authentication token>
+    pipeline_token = <Porch server pipeline authentication token>
 
     [MAIL]
     domain = <email FQDN>
