@@ -28,6 +28,16 @@ jobs:
           MYSQL_PASSWORD: "test"
           MYSQL_DATABASE: "study_notify"
 
+      porch:
+        image: "ghcr.io/wtsi-npg/python-3.10-npg-porch-2.0.0"
+        ports:
+          - "8081:8081"
+        options: >-
+          --health-cmd "curl -f http://localhost:8081"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
     steps:
       - uses: actions/checkout@v4
 
@@ -52,4 +62,3 @@ jobs:
       - name: Run linter (ruff)
         run: |
           poetry run ruff check --output-format=github .
-

@@ -1,0 +1,38 @@
+services:
+  mysql-server:
+    image: mysql:8.0
+    restart: always
+    ports:
+      - "127.0.0.1:3306:3306"
+    environment:
+      MYSQL_USER: "test"
+      MYSQL_PASSWORD: "test"
+      MYSQL_DATABASE: "study_notify"
+      MYSQL_RANDOM_ROOT_PASSWORD: "true"
+    healthcheck:
+      test: mysqladmin ping
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  porch-server:
+    image: "ghcr.io/wtsi-npg/python-3.10-npg-porch-2.0.0"
+    restart: always
+    ports:
+      - "127.0.0.1:8081:8081"
+    healthcheck:
+        test: curl -f http://localhost:8081
+        interval: 10s
+        timeout: 5s
+        retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    restart: always
+    depends_on:
+      mysql-server:
+        condition: service_healthy
+      porch-server:
+        condition: service_healthy
