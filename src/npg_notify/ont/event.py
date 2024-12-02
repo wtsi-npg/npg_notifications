@@ -342,7 +342,7 @@ def run_email_tasks(
                     domain=domain,
                     contacts=sorted(contacts),
                     subject=task.subject(),
-                    content=task.body(studies),
+                    content=task.body(studies, domain=domain),
                 )
 
                 pipeline.done(task)
