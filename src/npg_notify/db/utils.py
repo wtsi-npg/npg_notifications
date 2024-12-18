@@ -10,7 +10,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Session
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
-from npg_notify.config import get_config_data
+from npg_porch_cli.config import get_config_data
 
 
 def get_db_connection_string(

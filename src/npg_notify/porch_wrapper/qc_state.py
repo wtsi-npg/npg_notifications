@@ -7,11 +7,11 @@ import time
 from pathlib import PurePath
 from urllib.parse import urljoin
 
-from npg_notify.config import get_config_data
 from npg_notify.db.mlwh import get_study_contacts
 from npg_notify.db.utils import get_connection, get_db_connection_string
 from npg_notify.mail import generate_email_pac_bio, send_notification
 from npg_porch_cli import send_request
+from npg_porch_cli.config import get_config_data
 from npg_porch_cli.api import Pipeline, PorchAction
 from npg_porch_cli.api import send as send_porch_request
 
