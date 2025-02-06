@@ -81,7 +81,7 @@ class TestGenerateONTEmail:
 
 class TestONTMLWH:
     @m.context("When the plate (stock resources) for a run are queried")
-    @m.it("Returns the correct result")
+    @m.it("Returns the correct plates")
     def test_find_plates_for_run(self, ont_synthetic_mlwh):
         def assert_found(
             expt_name: str, slot: int, flowcell_id: str, expected_length: int
@@ -95,6 +95,8 @@ class TestONTMLWH:
         assert_found("multiplexed_experiment_000", 1, "flowcell_m000", 12)
         assert_found("multiplexed_experiment_001", 1, "flowcell_m001", 12)
 
+    @m.context("When contacts for a multiplexed run are queried")
+    @m.it("Returns the correct contacts")
     def test_contacts_for_run(self, ont_synthetic_mlwh):
         expt = "multiplexed_experiment_000"
         slot = 1
