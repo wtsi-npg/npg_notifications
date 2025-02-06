@@ -102,21 +102,19 @@ UPDATED = datetime(year=2020, month=1, day=1, hour=0, minute=0, second=0)
 def initialize_mlwh_ont(session: Session):
     """Populate the ML warehouse database with synthetic ONT-related records.
 
-    Three studies, X, Y and Z. Samples from studies X and Y, but none from Z,
-    are sequenced.
+    Four studies ("2", "3", "4" and "5). Samples from studies "2", "3" and "4",
+    but none from "5" are sequenced
 
-    A plate with 6 samples, 3 from one study X and 3 from Y. Two of the samples,
-    1 from each study are sequenced as simple (non-multiplexed) runs. The other 4
-    samples are not sequenced. Another plate has 3 samples from study Z, none of
-    which are sequenced.
+    Three plates for simple (non-multiplexed) runs, one sample per plate.
 
-    Six plates of 6 samples each, all the samples in 3 of the plates being from the
-    same study X and the other 3 plates from Y.
+    Two simple (non-multiplexed) experiment runs, using the first sample from each
+    of the first two plates respectively. No samples from plate the third are
+    sequenced.
 
-    The first plate of each study is sequenced as a multiplexed run of 12 samples.
-    The second plate of each study is sequenced twice as multiplexed runs of 12 samples.
-    The third plate of each study is not sequenced.
+    Six plates of samples for multiplexed runs.
 
+    Two multiplexed experiment runs of 12 samples, each using the 6 samples from 2
+    different plates of the same study.
     """
     instrument_name = "instrument_01"
     default_timestamps = {
