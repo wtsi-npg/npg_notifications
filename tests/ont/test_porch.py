@@ -80,7 +80,7 @@ class TestPorchPipeline:
         assert config is not None
         assert config.admin_token == "0" * 32
         assert config.pipeline_token is None
-        assert config.url == "http://porch-server:8081"
+        assert config.url == "http://127.0.0.1:8081"
 
     @m.context("When configured from both an INI file and environment variables")
     @m.it("Loads the configuration and falls back to environment variables")
@@ -98,7 +98,7 @@ class TestPorchPipeline:
         assert config is not None
         assert config.admin_token == "0" * 32
         assert config.pipeline_token == pipeline_token
-        assert config.url == "http://porch-server:8081"
+        assert config.url == "http://127.0.0.1:8081"
 
     @m.context("When a pipeline has been defined")
     @m.it("Can be registered")

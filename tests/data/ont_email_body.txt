@@ -1,0 +1,32 @@
+The ONT run for experiment multiplexed_experiment_000, flowcell flowcell_m000 has been uploaded. The data are available in iRODS at the following path:
+
+/testZone/home/irods/multiplexed_experiment_000_1_flowcell_m000
+
+This is an automated email from NPG. You are receiving it because you are registered as a contact for one or more of the Studies listed below:
+
+2 (Study two name)
+
+This run contains samples sequenced from the following plates:
+
+plate0_barcode
+plate1_barcode
+
+The breakdown of plates, samples and studies in this run is as follows:
+
+Plate            Well          Tag Tag Sequence                     Sample ID        Study ID
+plate0_barcode   A1           NB00 CACAAAGACACCGACAACTTTCTT         id_7             2
+plate0_barcode   A2           NB01 ACAGACGACTACAAACGGAATCGA         id_9             2
+plate0_barcode   A3           NB02 CCTGGTAACTGGGACACAAGACTC         id_11            2
+plate0_barcode   A4           NB03 TAGGGAAACACGATAGAATCCGAA         id_13            2
+plate0_barcode   A5           NB04 AAGGTTACACAAACCCTGGACAAG         id_15            2
+plate0_barcode   A6           NB05 GACTACTTTCTGCCTTTGCGAGAA         id_17            2
+plate1_barcode   A1           NB06 AAGGATTCATTCCCACGGTAACAC         id_19            2
+plate1_barcode   A2           NB07 ACGTAACTTGGTTTGTTCCCTGAA         id_21            2
+plate1_barcode   A3           NB08 AACCAAGACTCGCTGTGCCTAGTT         id_23            2
+plate1_barcode   A4           NB09 GAGAGGACAAAGGTTTCAACGCTT         id_25            2
+plate1_barcode   A5           NB10 TCCATTCCCTCCGATAGATGAAAC         id_27            2
+plate1_barcode   A6           NB11 TCCGATTCTGCTTCTTTCTACCTG         id_29            2
+
+If you have any questions or need further assistance, please feel free to contact a Scientific Service Representative at dnap-ssr@no-such-domain.sanger.ac.uk.
+
+NPG on behalf of DNA Pipelines.
