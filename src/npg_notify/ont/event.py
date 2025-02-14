@@ -1,5 +1,5 @@
 #
-# Copyright © 2024 Genome Research Ltd. All rights reserved.
+# Copyright © 2024, 2025 Genome Research Ltd. All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,12 +27,17 @@ from npg.cli import add_io_arguments, add_logging_arguments
 from npg.conf import IniData
 from npg.log import configure_structlog
 from partisan.irods import Collection
-from sqlalchemy import asc, distinct
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
 import npg_notify
-from npg_notify.db.mlwh import OseqFlowcell, Study, get_study_contacts
+from npg_notify.db.mlwh import (
+    OseqFlowcell,
+    StockResource,
+    find_plates_for_ont_run,
+    find_studies_for_ont_run,
+    get_study_contacts,
+)
 from npg_notify.db.utils import get_connection
 from npg_notify.mail import send_notification
 from npg_notify.ont.porch import Pipeline, Task
@@ -126,6 +131,10 @@ class ContactEmail(Task):
     the purpose of the emails is to inform the contacts of the run's location.
     """
 
+    @classmethod
+    def from_serializable(cls, serializable: dict):
+        return cls(**serializable)
+
     def __init__(
         self,
         experiment_name: str = None,
@@ -172,12 +181,12 @@ class ContactEmail(Task):
             f"has been {self.event}"
         )
 
-    def body(self, studies: list[Study], domain: str = None) -> str:
+    def body(self, flowcells: list[Type[OseqFlowcell]], domain: str = None) -> str:
         """Return the body of the email.
 
         Args:
-            studies: The studies associated with the run.
-            domain: A network domain name to use when sending email. The main will
+            flowcells: OseqFlowcell records associated with this run (one per sample).
+            domain: A network domain name to use when sending email. The email will
                 be sent from mail.<domain> with <user>@<domain> in the From: header.
         """
         if domain is None:
@@ -187,21 +196,24 @@ class ContactEmail(Task):
             "ont_event_email_template.txt"
         )
 
-        study_descs = [f"{s.id_study_lims} ({s.name})" for s in studies]
-
+        breakdown, plates, studies = self._plate_summary(flowcells)
         with resources.as_file(source) as template:
             with open(template) as f:
                 t = Template(f.read())
-                return t.substitute(
+                body = t.substitute(
                     {
                         "experiment_name": self.experiment_name,
                         "flowcell_id": self.flowcell_id,
                         "path": self.path,
                         "event": self.event,
-                        "studies": "\n".join(study_descs),
+                        "studies": studies,
+                        "plates": plates,
+                        "breakdown": breakdown,
                         "domain": domain,
                     }
                 )
+                # Right trim any unused whitespace padding (helps testing)
+                return "\n".join([line.rstrip() for line in body.splitlines()])
 
     def to_serializable(self) -> dict:
         return {
@@ -212,16 +224,55 @@ class ContactEmail(Task):
             "event": self.event,
         }
 
-    @classmethod
-    def from_serializable(cls, serializable: dict):
-        return cls(**serializable)
-
     def __str__(self):
         return (
             f"<ONT experiment: {self.experiment_name} "
             f"instrument slot: {self.instrument_slot} "
             f"flowcell ID: {self.flowcell_id} "
             f"event: {self.event}>"
+        )
+
+    @staticmethod
+    def _plate_summary(flowcells: list[Type[OseqFlowcell]]) -> tuple[str, str, str]:
+        """Return a multi-line strings containing human-readable summaries of plates,
+        studies and tags."""
+        # Column format widths are reasonable guesses
+        c1, c2, c3, c4, c5, c6 = 16, 4, 12, 32, 16, 6
+
+        summary = [
+            " ".join(
+                [
+                    "Plate".ljust(c1),
+                    "Well".ljust(c2),
+                    "Tag".rjust(c3),
+                    "Tag Sequence".ljust(c4),
+                    "Sample ID".ljust(c5),
+                    "Study ID".ljust(c6),
+                ]
+            )
+        ]
+
+        plates = set()
+        studies = set()
+
+        for fc in flowcells:
+            well: StockResource = fc.stock_resources
+            plates.add(well.labware_human_barcode)
+            studies.add(f"{fc.study.id_study_lims} ({fc.study.name})")
+
+            summary.append(
+                f"{well.labware_human_barcode:<{c1}} "
+                f"{well.labware_coordinate:<{c2}} "
+                f"{fc.tag_identifier:>{c3}} "
+                f"{fc.tag_sequence:<{c4}} "
+                f"{fc.sample.id_sample_lims:<{c5}} "
+                f"{fc.study.id_study_lims:<{c6}}"
+            )
+
+        return (
+            "\n".join(summary),
+            "\n".join(sorted(plates)),
+            "\n".join(sorted(studies)),
         )
 
 
@@ -307,9 +358,20 @@ def run_email_tasks(
     for task in pipeline.claim(batch_size):
         try:
             np += 1
-            studies = find_studies_for_run(
+            studies = find_studies_for_ont_run(
                 session, task.experiment_name, task.instrument_slot, task.flowcell_id
             )
+            plates = find_plates_for_ont_run(
+                session, task.experiment_name, task.instrument_slot, task.flowcell_id
+            )
+
+            for plate in plates:
+                log.info(
+                    "Plate found",
+                    pipeline=pipeline,
+                    task=task,
+                    plate=plate,
+                )
 
             # We are sending a single email to all contacts of all studies in the run
             contacts = set()
@@ -367,34 +429,6 @@ def run_email_tasks(
             pipeline.retry(task)
 
     return np, ns, ne
-
-
-def find_studies_for_run(
-    session: Session, experiment_name: str, instrument_slot: int, flowcell_id: str
-) -> list[Type[Study]]:
-    """Return the studies associated with an ONT run, ordered by ascending
-    id_study_lims.
-
-    Args:
-        session: An open MLWH DB session.
-        experiment_name: The experiment name.
-        instrument_slot: The instrument slot.
-        flowcell_id: The flowcell ID.
-
-    Returns:
-        Studies associated with the run.
-    """
-    return (
-        session.query(Study)
-        .join(OseqFlowcell)
-        .filter(
-            OseqFlowcell.experiment_name == experiment_name,
-            OseqFlowcell.instrument_slot == instrument_slot,
-            OseqFlowcell.flowcell_id == flowcell_id,
-        )
-        .order_by(asc(Study.id_study_lims))
-        .all()
-    )
 
 
 @dataclass

@@ -1,14 +1,22 @@
 import json
 
 from pytest import mark as m
+from structlog import get_logger
 
-from npg_notify.db.mlwh import Study
+from npg_notify.db.mlwh import (
+    Study,
+    find_flowcells_for_ont_run,
+    find_plates_for_ont_run,
+    get_study_contacts,
+)
 from npg_notify.ont.event import ContactEmail, EventType
+from ont.conftest import ont_synthetic_mlwh
+
+logger = get_logger()
 
 
 @m.describe("Generate ONT email")
 class TestGenerateONTEmail:
-
     @m.context("When an ONT event is serialized and deserialized")
     @m.it("Retains the correct values")
     def test_serialize_deserialize_event(self):
@@ -38,15 +46,13 @@ class TestGenerateONTEmail:
 
     @m.context("When an ONT email is generated")
     @m.it("Has the correct subject and body")
-    def test_generate_email(self):
-        expt = "experiment1"
+    def test_generate_email(self, ont_synthetic_mlwh):
+        expt = "multiplexed_experiment_000"
         slot = 1
-        flowcell_id = "FAKE12345"
+        flowcell_id = "flowcell_m000"
         path = f"/testZone/home/irods/{expt}_{slot}_{flowcell_id}"
         event_type = EventType.UPLOADED
-
         domain = "no-such-domain.sanger.ac.uk"
-        studies = [Study(name="study1"), Study(name="study2")]
 
         event = ContactEmail(
             experiment_name=expt,
@@ -61,19 +67,53 @@ class TestGenerateONTEmail:
             == f"Update: ONT run {expt} flowcell {flowcell_id} has been {event_type}"
         )
 
-        study_descs = [f"{s.id_study_lims} ({s.name})" for s in studies]
-        study_lines = "\n".join(study_descs)
-
-        assert event.body(studies, domain=domain) == (
-            f"The ONT run for experiment {expt}, flowcell {flowcell_id} has been {event_type}. The data are available in iRODS at the following path:\n"
-            "\n"
-            f"{path}\n"
-            "\n"
-            "This is an automated email from NPG. You are receiving it because you are registered as a contact for one or more of the Studies listed below:\n"
-            "\n"
-            f"{study_lines}\n"
-            "\n"
-            f"If you have any questions or need further assistance, please feel free to contact a Scientific Service Representative at dnap-ssr@{domain}.\n"
-            "\n"
-            "NPG on behalf of DNA Pipelines.\n"
+        flowcells = find_flowcells_for_ont_run(
+            ont_synthetic_mlwh,
+            experiment_name=expt,
+            instrument_slot=slot,
+            flowcell_id=flowcell_id,
         )
+
+        with open("tests/data/ont_email_body.txt", "r", encoding="utf-8") as f:
+            expected = [line.rstrip() for line in f]
+            assert event.body(flowcells, domain=domain).splitlines() == expected
+
+
+class TestONTMLWH:
+    @m.context("When the plate (stock resources) for a run are queried")
+    @m.it("Returns the correct plates")
+    def test_find_plates_for_run(self, ont_synthetic_mlwh):
+        def assert_found(
+            expt_name: str, slot: int, flowcell_id: str, expected_length: int
+        ):
+            plates = find_plates_for_ont_run(
+                ont_synthetic_mlwh, expt_name, slot, flowcell_id
+            )
+            assert len(plates) == expected_length
+
+        assert_found("simple_experiment_000", 1, "flowcell_s000", 1)
+        assert_found("multiplexed_experiment_000", 1, "flowcell_m000", 12)
+        assert_found("multiplexed_experiment_001", 1, "flowcell_m001", 12)
+
+    @m.context("When contacts for a multiplexed run are queried")
+    @m.it("Returns the correct contacts")
+    def test_contacts_for_run(self, ont_synthetic_mlwh):
+        expt = "multiplexed_experiment_000"
+        slot = 1
+        flowcell_id = "flowcell_m000"
+
+        flowcells = find_flowcells_for_ont_run(
+            ont_synthetic_mlwh,
+            experiment_name=expt,
+            instrument_slot=slot,
+            flowcell_id=flowcell_id,
+        )
+
+        studies = {fc.study for fc in flowcells}
+        assert len(studies) == 1
+        assert get_study_contacts(ont_synthetic_mlwh, studies.pop().id_study_lims) == [
+            "owner@sanger.ac.uk",
+            "user1@sanger.ac.uk",
+            "user2@sanger.ac.uk",
+            "user3@sanger.ac.uk",
+        ]

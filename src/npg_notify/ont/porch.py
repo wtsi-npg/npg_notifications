@@ -187,11 +187,6 @@ class Pipeline(Generic[T]):
     """
 
     @dataclass
-    class Config:
-        name: str
-        uri: str
-
-    @dataclass
     class ServerConfig:
         """Configuration for a Porch pipeline server.
 
