@@ -4,7 +4,6 @@ from pytest import mark as m
 from structlog import get_logger
 
 from npg_notify.db.mlwh import (
-    Study,
     find_flowcells_for_ont_run,
     find_plates_for_ont_run,
     get_study_contacts,

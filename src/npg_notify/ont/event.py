@@ -34,6 +34,7 @@ import npg_notify
 from npg_notify.db.mlwh import (
     OseqFlowcell,
     StockResource,
+    find_flowcells_for_ont_run,
     find_plates_for_ont_run,
     find_studies_for_ont_run,
     get_study_contacts,
@@ -364,14 +365,12 @@ def run_email_tasks(
             plates = find_plates_for_ont_run(
                 session, task.experiment_name, task.instrument_slot, task.flowcell_id
             )
+            flowcells = find_flowcells_for_ont_run(
+                session, task.experiment_name, task.instrument_slot, task.flowcell_id
+            )
 
             for plate in plates:
-                log.info(
-                    "Plate found",
-                    pipeline=pipeline,
-                    task=task,
-                    plate=plate,
-                )
+                log.info("Plate found", pipeline=pipeline, task=task, plate=plate)
 
             # We are sending a single email to all contacts of all studies in the run
             contacts = set()
@@ -389,10 +388,7 @@ def run_email_tasks(
 
             if len(contacts) == 0:
                 log.info(
-                    "No contacts found",
-                    pipeline=pipeline,
-                    task=task,
-                    studies=studies,
+                    "No contacts found", pipeline=pipeline, task=task, studies=studies
                 )
 
                 pipeline.done(task)
@@ -404,7 +400,7 @@ def run_email_tasks(
                     domain=domain,
                     contacts=sorted(contacts),
                     subject=task.subject(),
-                    content=task.body(studies, domain=domain),
+                    content=task.body(flowcells, domain=domain),
                 )
 
                 pipeline.done(task)
