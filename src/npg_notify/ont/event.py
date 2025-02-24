@@ -213,7 +213,7 @@ class ContactEmail(Task):
                         "domain": domain,
                     }
                 )
-                # Right trim any unused whitespace padding (helps testing)
+                # Right trim any unused whitespace padding (helps in testing)
                 return "\n".join([line.rstrip() for line in body.splitlines()])
 
     def to_serializable(self) -> dict:
@@ -263,9 +263,9 @@ class ContactEmail(Task):
 
             summary.append(
                 f"{well.labware_human_barcode:<{c1}} "
-                f"{well.labware_coordinate:<{c2}} "
-                f"{fc.tag_identifier:>{c3}} "
-                f"{fc.tag_sequence:<{c4}} "
+                f"{str(well.labware_coordinate):<{c2}} "  # Nullable
+                f"{str(fc.tag_identifier):>{c3}} "  # Nullable
+                f"{str(fc.tag_sequence):<{c4}} "  # Nullable
                 f"{fc.sample.id_sample_lims:<{c5}} "
                 f"{fc.study.id_study_lims:<{c6}}"
             )

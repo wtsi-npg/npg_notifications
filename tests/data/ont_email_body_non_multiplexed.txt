@@ -1,0 +1,20 @@
+The ONT run for experiment simple_experiment_000, flowcell flowcell_s000 has been uploaded. The data are available in iRODS at the following path:
+
+/testZone/home/irods/simple_experiment_000_1_flowcell_s000
+
+This is an automated email from NPG. You are receiving it because you are registered as a contact for one or more of the Studies listed below:
+
+2 (Study two name)
+
+This run contains samples sequenced from the following plates:
+
+plate0_barcode
+
+The breakdown of plates, samples and studies in this run is as follows:
+
+Plate            Well          Tag Tag Sequence                     Sample ID        Study ID
+plate0_barcode   A1           None None                             id_1             2
+
+If you have any questions or need further assistance, please feel free to contact a Scientific Service Representative at dnap-ssr@no-such-domain.sanger.ac.uk.
+
+NPG on behalf of DNA Pipelines.

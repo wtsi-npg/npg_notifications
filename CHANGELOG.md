@@ -5,6 +5,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.3.1] - 2025-02-24
+
+- Fix bug in ONT email generation for non-multiplexed runs
+
 ## [0.3.0] - 2025-02-14
 
 - Add a summary of plates and tags to ONT email
