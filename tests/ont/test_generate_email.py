@@ -43,9 +43,47 @@ class TestGenerateONTEmail:
         assert event2.path == path
         assert event2.event == event_type
 
-    @m.context("When an ONT email is generated")
+    @m.context("When an ONT email is generated for a non-multiplexed run")
     @m.it("Has the correct subject and body")
-    def test_generate_email(self, ont_synthetic_mlwh):
+    def test_generate_email_non_multiplexed(self, ont_synthetic_mlwh):
+        expt = "simple_experiment_000"
+        slot = 1
+        flowcell_id = "flowcell_s000"
+        path = f"/testZone/home/irods/{expt}_{slot}_{flowcell_id}"
+        event_type = EventType.UPLOADED
+        domain = "no-such-domain.sanger.ac.uk"
+
+        event = ContactEmail(
+            experiment_name=expt,
+            instrument_slot=slot,
+            flowcell_id=flowcell_id,
+            path=path,
+            event=event_type,
+        )
+
+        assert (
+            event.subject()
+            == f"Update: ONT run {expt} flowcell {flowcell_id} has been {event_type}"
+        )
+
+        flowcells = find_flowcells_for_ont_run(
+            ont_synthetic_mlwh,
+            experiment_name=expt,
+            instrument_slot=slot,
+            flowcell_id=flowcell_id,
+        )
+
+        # assert event.body(flowcells, domain=domain).splitlines() == "arse"
+
+        with open(
+            "tests/data/ont_email_body_non_multiplexed.txt", "r", encoding="utf-8"
+        ) as f:
+            expected = [line.rstrip() for line in f]
+            assert event.body(flowcells, domain=domain).splitlines() == expected
+
+    @m.context("When an ONT email is generated for a multiplexed run")
+    @m.it("Has the correct subject and body")
+    def test_generate_email_multiplexed(self, ont_synthetic_mlwh):
         expt = "multiplexed_experiment_000"
         slot = 1
         flowcell_id = "flowcell_m000"
@@ -73,7 +111,9 @@ class TestGenerateONTEmail:
             flowcell_id=flowcell_id,
         )
 
-        with open("tests/data/ont_email_body.txt", "r", encoding="utf-8") as f:
+        with open(
+            "tests/data/ont_email_body_multiplexed.txt", "r", encoding="utf-8"
+        ) as f:
             expected = [line.rstrip() for line in f]
             assert event.body(flowcells, domain=domain).splitlines() == expected
 
