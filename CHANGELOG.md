@@ -5,6 +5,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.4.1] - 2025-02-27
+
+- Fix --log-json CLI option for ONT
+
 ## [0.4.0] - 2025-02-27
 
 - Bump partisan from 2.13.0 toi 2.14.0
