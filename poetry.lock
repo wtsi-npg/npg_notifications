@@ -409,12 +409,12 @@ resolved_reference = "5f463f74fb915b8a9fd87138c138fb1e1b5162aa"
 
 [[package]]
 name = "npg-python-lib"
-version = "0.3.4"
+version = "1.0.0"
 description = "A library of Python functions and classes common to NPG applications."
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "npg_python_lib-0.3.4.tar.gz", hash = "sha256:02cdd0659f91680a9ed160d538548722e070d6f0bd51548b0ea7ffd90458b6cb"},
+    {file = "npg_python_lib-1.0.0.tar.gz", hash = "sha256:02c7ee7e3a88fbeed0d96e1850aa7aeb83f543b3e42fc39fe26e03cc6d7a4c28"},
 ]
 
 [package.dependencies]
@@ -422,11 +422,11 @@ python-dateutil = ">=2.9.0,<3"
 structlog = ">=23.3.0"
 
 [package.extras]
-test = ["black (>=24.3.0,<25)", "pytest (>=8.0,<9)", "pytest-it (>=0.1.5)"]
+test = ["black (>=24.3.0,<26)", "pytest (>=8.0,<9)", "pytest-it (>=0.1.5)"]
 
 [package.source]
 type = "url"
-url = "https://github.com/wtsi-npg/npg-python-lib/releases/download/0.3.4/npg_python_lib-0.3.4.tar.gz"
+url = "https://github.com/wtsi-npg/npg-python-lib/releases/download/1.0.0/npg_python_lib-1.0.0.tar.gz"
 
 [[package]]
 name = "packaging"
@@ -441,12 +441,12 @@ files = [
 
 [[package]]
 name = "partisan"
-version = "2.13.0"
+version = "2.14.0"
 description = "A Python API for iRODS using the baton iRODS client"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "partisan-2.13.0.tar.gz", hash = "sha256:a4b5edd8f97933e5f34ae942407069cacb032c41bb51bee53fe02ed8564053cb"},
+    {file = "partisan-2.14.0.tar.gz", hash = "sha256:c7d16ee55761a75a1b7bf9f3d8b65506b5183875a31d6e795860515415d210a8"},
 ]
 
 [package.dependencies]
@@ -455,11 +455,11 @@ python-dateutil = ">=2.9.0,<3"
 structlog = ">=23.3.0"
 
 [package.extras]
-test = ["black (>=24.3.0,<25)", "pytest (>=8.0,<9)", "pytest-it (>=0.1.5)"]
+test = ["black (>=24.3.0,<26)", "pytest (>=8.0,<9)", "pytest-it (>=0.1.5)"]
 
 [package.source]
 type = "url"
-url = "https://github.com/wtsi-npg/partisan/releases/download/2.13.0/partisan-2.13.0.tar.gz"
+url = "https://github.com/wtsi-npg/partisan/releases/download/2.14.0/partisan-2.14.0.tar.gz"
 
 [[package]]
 name = "pluggy"
@@ -856,4 +856,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "168425fd4db11a484e6e1c5b2b847deef8dab66196d66aed23f644179bc3d805"
+content-hash = "4651bcbc529fedb204f7af53b64eb8bc382a5a8ac4acf8bff82bed37eadf8319"
