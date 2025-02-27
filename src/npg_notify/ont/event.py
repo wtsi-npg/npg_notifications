@@ -484,7 +484,7 @@ def main():
         debug=args.debug,
         verbose=args.verbose,
         colour=args.colour,
-        json=args.json,
+        json=args.log_json,
     )
 
     config_file = args.conf_file_path
