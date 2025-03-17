@@ -14,7 +14,7 @@ npg_ont_event_notification = "npg_notify.ont.event:main"
 python = "^3.11"
 SQLAlchemy = { version="^2.0.39", extras=["pymysql"] }
 SQLAlchemy-Utils = "^0.41.2"
-cryptography = "^44.0.1"
+cryptography = "^44.0.2"
 PyYAML = "^6.0.0"
 npg_porch_cli = { git="https://github.com/wtsi-npg/npg_porch_cli.git", tag="0.1.0" }
 partisan = { url = "https://github.com/wtsi-npg/partisan/releases/download/2.14.0/partisan-2.14.0.tar.gz" }
