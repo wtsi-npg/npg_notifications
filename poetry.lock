@@ -848,14 +848,14 @@ url = ["furl (>=0.4.1)"]
 
 [[package]]
 name = "structlog"
-version = "24.4.0"
+version = "25.2.0"
 description = "Structured Logging for Python"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "structlog-24.4.0-py3-none-any.whl", hash = "sha256:597f61e80a91cc0749a9fd2a098ed76715a1c8a01f73e336b746504d1aad7610"},
-    {file = "structlog-24.4.0.tar.gz", hash = "sha256:b27bfecede327a6d2da5fbc96bd859f114ecc398a6389d664f62085ee7ae6fc4"},
+    {file = "structlog-25.2.0-py3-none-any.whl", hash = "sha256:0fecea2e345d5d491b72f3db2e5fcd6393abfc8cd06a4851f21fcd4d1a99f437"},
+    {file = "structlog-25.2.0.tar.gz", hash = "sha256:d9f9776944207d1035b8b26072b9b140c63702fd7aa57c2f85d28ab701bd8e92"},
 ]
 
 [package.extras]
@@ -897,4 +897,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "07e1e9b47a69b3a24493eeff3419de7e10ee902256bd9af37cefc5deb3fda533"
+content-hash = "e6041c265fff0b5f6d95f5c7024c56fcea267039811ceacc944a8f10856be7f9"
