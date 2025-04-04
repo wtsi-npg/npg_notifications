@@ -411,22 +411,22 @@ files = [
 
 [[package]]
 name = "npg-porch-cli"
-version = "0.1.0"
+version = "0.3.1"
 description = "CLI client for communicating with npg_porch JSON API"
 optional = false
 python-versions = "^3.10"
 groups = ["main"]
-files = []
-develop = false
+files = [
+    {file = "0.3.1.tar.gz", hash = "sha256:d92790bc628533be6f74fc2aaada8a2ed03425d9449dffe22287674ea2dc1d4b"},
+]
 
 [package.dependencies]
-requests = "^2.31.0"
+npg-python-lib = {url = "https://github.com/wtsi-npg/npg-python-lib/releases/download/1.0.0/npg_python_lib-1.0.0.tar.gz"}
+requests = ">=2.31.0,<3.0.0"
 
 [package.source]
-type = "git"
-url = "https://github.com/wtsi-npg/npg_porch_cli.git"
-reference = "0.1.0"
-resolved_reference = "5f463f74fb915b8a9fd87138c138fb1e1b5162aa"
+type = "url"
+url = "https://github.com/wtsi-npg/npg_porch_cli/archive/refs/tags/0.3.1.tar.gz"
 
 [[package]]
 name = "npg-python-lib"
@@ -897,4 +897,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "07e1e9b47a69b3a24493eeff3419de7e10ee902256bd9af37cefc5deb3fda533"
+content-hash = "8baa203708a4b96cbbf54b1b5e419d964c31db75a1c8de9f6f069421fc486b7d"
