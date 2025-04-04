@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.4.2] - 2025-04-04
+
+- Updated dependencies, moved version of npg_porch_cli to 0.3.0 to keep this
+  package compatible with other Python packages that depend on npg_porch_cli
+
 ## [0.4.1] - 2025-02-27
 
 - Fix --log-json CLI option for ONT
