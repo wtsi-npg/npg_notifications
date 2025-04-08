@@ -12,7 +12,7 @@ npg_ont_event_notification = "npg_notify.ont.event:main"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-SQLAlchemy = { version="^2.0.39", extras=["pymysql"] }
+SQLAlchemy = { version="^2.0.40", extras=["pymysql"] }
 SQLAlchemy-Utils = "^0.41.2"
 cryptography = "^44.0.2"
 PyYAML = "^6.0.0"
