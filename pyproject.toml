@@ -19,7 +19,7 @@ PyYAML = "^6.0.0"
 npg_porch_cli = { url="https://github.com/wtsi-npg/npg_porch_cli/archive/refs/tags/0.3.1.tar.gz" }
 partisan = { url = "https://github.com/wtsi-npg/partisan/releases/download/2.14.0/partisan-2.14.0.tar.gz" }
 npg-python-lib = { url = "https://github.com/wtsi-npg/npg-python-lib/releases/download/1.0.0/npg_python_lib-1.0.0.tar.gz" }
-requests = "^2.32.4"
+requests = "^2.32.5"
 structlog = "^24.4.0"
 
 [tool.poetry.dev-dependencies]
