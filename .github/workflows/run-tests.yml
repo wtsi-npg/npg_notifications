@@ -10,10 +10,13 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mysql_version: ["8.0", "8.4.7"]
 
     services:
       mysql:
-        image: "mysql:8.0"
+        image: "mysql:${{ matrix.mysql_version }}"
         ports:
           - "3306:3306"
         options: >-

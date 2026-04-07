@@ -5,6 +5,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+- Add job matrix to test with multiple versions of MySQL service
+
 ## [0.4.2] - 2025-04-04
 
 - Updated dependencies, moved version of npg_porch_cli to 0.3.1 to keep this
