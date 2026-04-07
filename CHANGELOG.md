@@ -5,6 +5,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+- Upgraded MySQL version in GitHub CI to 8.4
+
 ## [0.4.2] - 2025-04-04
 
 - Updated dependencies, moved version of npg_porch_cli to 0.3.1 to keep this
