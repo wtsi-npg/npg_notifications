@@ -26,6 +26,7 @@ from typing import Type
 from npg.cli import add_io_arguments, add_logging_arguments
 from npg.conf import IniData
 from npg.log import configure_structlog
+from npg_polite.porch import Pipeline, Task
 from partisan.irods import Collection
 from sqlalchemy.orm import Session
 from structlog import get_logger
@@ -41,7 +42,6 @@ from npg_notify.db.mlwh import (
 )
 from npg_notify.db.utils import get_connection
 from npg_notify.mail import send_notification
-from npg_notify.ont.porch import Pipeline, Task
 
 log = get_logger(__package__)
 

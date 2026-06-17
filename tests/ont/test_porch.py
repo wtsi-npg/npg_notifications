@@ -20,6 +20,7 @@ from decimal import Decimal
 from pathlib import Path
 from uuid import uuid4
 
+from npg_polite.porch import Pipeline, Task
 from pytest import mark as m
 
 from conftest import porch_server_available
@@ -28,7 +29,6 @@ from npg.conf import IniData
 
 from npg_notify import version
 from npg_notify.ont.event import PORCH_CONFIG_FILE_SECTION
-from npg_notify.ont.porch import Pipeline, Task
 
 porch_server_is_up = m.skipif(
     not porch_server_available(), reason="Test Porch server is not available"

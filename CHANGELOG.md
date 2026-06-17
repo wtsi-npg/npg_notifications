@@ -5,6 +5,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+- Updated npg_porch_cli to 0.3.3, npg-python-lib to 2.0.0 and partisan to 4.3.5
+
+- Adopted npg_polite as a Porch client for ONT (adds Porch 3.0 support)
+
+- Updated Porch version in Docker files to 3.0
+
+- Upgraded MySQL version in Docker files to 8.4
+
 - Upgraded MySQL version in GitHub CI to 8.4
 
 ## [0.4.2] - 2025-04-04

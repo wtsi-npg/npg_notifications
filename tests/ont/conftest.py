@@ -19,11 +19,13 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
+from typing import Callable
 from urllib import parse
 
 import pytest
 import requests
 from npg.conf import IniData
+from npg_polite.porch import Pipeline
 from requests import HTTPError
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session, sessionmaker
@@ -35,7 +37,6 @@ from npg_notify.ont.event import (
     MYSQL_MLWH_CONFIG_FILE_SECTION,
     PORCH_CONFIG_FILE_SECTION,
 )
-from npg_notify.ont.porch import Pipeline
 
 ont_test_config = Path("./tests/data/ont_event_app_config.ini")
 
@@ -69,7 +70,7 @@ def porch_server_available() -> bool:
         raise
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def porch_server_config() -> Pipeline.ServerConfig:
     return IniData(Pipeline.ServerConfig).from_file(
         ont_test_config, PORCH_CONFIG_FILE_SECTION
@@ -81,7 +82,7 @@ def ont_tag_identifier(tag_index: int) -> str:
     return f"NB{tag_index:02d}"
 
 
-def make_id_source(start: int = 0) -> callable:
+def make_id_source(start: int = 0) -> Callable:
     """Return a deterministic generator for unique ID to use in test fixtures."""
 
     def fn():
@@ -319,7 +320,7 @@ def mlwh_session():
 
     mlwh.Base.metadata.create_all(engine)
     session_maker = sessionmaker(bind=engine)
-    sess: Session() = session_maker()
+    sess: Session = session_maker()
 
     try:
         yield sess
