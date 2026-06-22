@@ -13,7 +13,7 @@ jobs:
 
     services:
       mysql:
-        image: "mysql:8.0"
+        image: "mysql:8.4"
         ports:
           - "3306:3306"
         options: >-
@@ -29,7 +29,7 @@ jobs:
           MYSQL_DATABASE: "study_notify"
 
       porch:
-        image: "ghcr.io/wtsi-npg/python-3.10-npg-porch-2.0.0"
+        image: "ghcr.io/wtsi-npg/python-3.14-npg-porch-3.0"
         ports:
           - "8081:8081"
         options: >-
@@ -39,13 +39,13 @@ jobs:
           --health-retries 10
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install Poetry
         run: |
           pipx install poetry
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
           architecture: 'x64'
