@@ -23,7 +23,7 @@ from importlib import resources
 from string import Template
 from typing import Type
 
-from npg.cli import add_io_arguments, add_logging_arguments
+from npg.cli import add_io_arguments, add_logging_arguments, open_input, open_output
 from npg.conf import IniData
 from npg.log import configure_structlog
 from npg_polite.porch import Pipeline, Task
@@ -335,6 +335,14 @@ def add_email_tasks(
     return np, ns, ne
 
 
+def add_email_tasks_from_paths(
+    pipeline: Pipeline, event: EventType, input_path: str, output_path: str
+) -> tuple[int, int, int]:
+    """Add email tasks using file paths or STDIN/STDOUT markers."""
+    with open_input(input_path) as reader, open_output(output_path) as writer:
+        return add_email_tasks(pipeline, event, reader, writer)
+
+
 def run_email_tasks(
     pipeline: Pipeline, session: Session, domain: str
 ) -> tuple[int, int, int]:
@@ -504,7 +512,7 @@ def main():
     action = args.action
     event = args.event
     if action == "add":
-        num_processed, num_succeeded, num_errors = add_email_tasks(
+        num_processed, num_succeeded, num_errors = add_email_tasks_from_paths(
             pipeline, event, args.input, args.output
         )
     elif action == "run":

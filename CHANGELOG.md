@@ -3,7 +3,11 @@
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [0.4.4] - 2026-06-25
+
+- Fix ONT command line parsing bug introduced when updating npg-python-lib.
+
+## [0.4.3] - 2026-06-23
 
 - Updated npg_porch_cli to 0.3.3, npg-python-lib to 2.0.0 and partisan to 4.3.5
 
