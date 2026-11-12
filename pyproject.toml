@@ -13,7 +13,7 @@ npg_ont_event_notification = "npg_notify.ont.event:main"
 [tool.poetry.dependencies]
 python = "^3.11"
 SQLAlchemy = { version="^2.0.44", extras=["pymysql"] }
-SQLAlchemy-Utils = "^0.41.2"
+SQLAlchemy-Utils = ">=0.41.2,<0.44.0"
 cryptography = "^46.0.5"
 PyYAML = "^6.0.0"
 npg_porch_cli = { url="https://github.com/wtsi-npg/npg_porch_cli/archive/refs/tags/0.3.3.tar.gz" }
