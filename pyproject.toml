@@ -24,7 +24,7 @@ requests = "^2.32.4"
 structlog = ">=25,<27"
 
 [tool.poetry.dev-dependencies]
-pytest = "^9.0.2"
+pytest = "^9.2.0"
 pytest-it = "^0.1.5"
 requests-mock = "^1.12.1"
 ruff = "^0.12.7"
